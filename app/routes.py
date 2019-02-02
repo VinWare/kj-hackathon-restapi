@@ -2,7 +2,7 @@ from app import app
 from flask import jsonify, make_response, request, abort
 from .auth_setup import auth
 from .db_setup import mysql
-from .helper import get_public_types, generate_token, make_public
+from .helper import get_public_types, generate_token, make_public, pass_hash
 
 @app.route('/')
 @app.route('/index')
@@ -72,7 +72,7 @@ def sign_up():
     if not 'username' in request.json or not 'password' in request.json or not 'full-name' in request.json or not 'blockchain-address' in request.json:
         abort(400)
     cur = mysql.connection.cursor()
-    cur.execute('INSERT INTO user(username, password_hash, full_name, blockchain) VALUES(%s, %s, %s, %s)', (request.json['username'], request.json['password'], request.json['full-name'], request.json['blockchain-address']))
+    cur.execute('INSERT INTO user(username, password_hash, full_name, blockchain) VALUES(%s, %s, %s, %s)', (request.json['username'], pass_hash(request.json['password']), request.json['full-name'], request.json['blockchain-address']))
     mysql.connection.commit()
 
 @app.route('/crowdfunding/ap/v1.0.0/project', methods=['POST'])

@@ -3,6 +3,7 @@ from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSign
 from app import app
 from .db_setup import mysql
 from flask import g, url_for
+from werkzeug.security import generate_password_hash
 
 def get_public_types():
     return ['Product']
@@ -29,3 +30,6 @@ def make_public(student):
         else:
             new_student[info] = student[info]
     return new_student
+
+def pass_hash(password):
+    return generate_password_hash(password)
