@@ -1,3 +1,4 @@
 python3 -m virtualenv flask
 flask/bin/pip install flask
 flask/bin/pip install flask-httpauth
+flask/bin/pip install flask-mysqldb
