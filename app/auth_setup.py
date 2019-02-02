@@ -12,7 +12,7 @@ def verify_password(username_token, password):
         user_id = verify_token(username_token)
         if not user_id:
                 cur = mysql.connection.cursor()
-                cur.execute("SELECT user_id, password_hash FROM user WHERE username = %s", (username_token,))
+                cur.execute("SELECT user_id, password_hash FROM user WHERE user_name = %s", (username_token,))
                 user = cur.fetchone()
                 if not user or check_password_hash(user['password_hash'],password):
                         return False
