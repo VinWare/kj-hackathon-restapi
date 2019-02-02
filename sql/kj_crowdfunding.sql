@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 02, 2019 at 01:10 PM
+-- Generation Time: Feb 02, 2019 at 08:59 PM
 -- Server version: 10.1.30-MariaDB
 -- PHP Version: 7.2.1
 
@@ -25,6 +25,17 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `donations`
+--
+
+CREATE TABLE `donations` (
+  `sponsor_id` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `invest`
 --
 
@@ -41,7 +52,6 @@ CREATE TABLE `invest` (
 --
 
 CREATE TABLE `project` (
-  `user_id` int(11) DEFAULT NULL,
   `project_id` int(11) NOT NULL,
   `project_name` varchar(255) NOT NULL,
   `category` enum('IT Solutions','Security') NOT NULL,
@@ -50,6 +60,17 @@ CREATE TABLE `project` (
   `start_date` date NOT NULL,
   `complete_date` date NOT NULL,
   `project_type` enum('Product','Service') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `project_members`
+--
+
+CREATE TABLE `project_members` (
+  `user_id` int(11) NOT NULL,
+  `project_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -84,13 +105,23 @@ CREATE TABLE `student` (
 
 CREATE TABLE `user` (
   `user_id` int(11) NOT NULL,
-  `user_name` varchar(127) NOT NULL,
+  `user_name` varchar(255) NOT NULL,
+  `full_name` varchar(127) NOT NULL,
+  `password_hash` varchar(128) NOT NULL,
   `blockchain` varchar(63) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `donations`
+--
+ALTER TABLE `donations`
+  ADD PRIMARY KEY (`sponsor_id`,`student_id`),
+  ADD KEY `sponsor_id` (`sponsor_id`),
+  ADD KEY `student_id` (`student_id`);
 
 --
 -- Indexes for table `invest`
@@ -103,8 +134,17 @@ ALTER TABLE `invest`
 -- Indexes for table `project`
 --
 ALTER TABLE `project`
-  ADD PRIMARY KEY (`project_id`),
-  ADD KEY `user_project` (`user_id`);
+  ADD PRIMARY KEY (`project_id`);
+
+--
+-- Indexes for table `project_members`
+--
+ALTER TABLE `project_members`
+  ADD PRIMARY KEY (`user_id`,`project_id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `project_id` (`project_id`),
+  ADD KEY `user_id_2` (`user_id`),
+  ADD KEY `project_id_2` (`project_id`);
 
 --
 -- Indexes for table `sponsor`
@@ -116,31 +156,57 @@ ALTER TABLE `sponsor`
 -- Indexes for table `student`
 --
 ALTER TABLE `student`
-  ADD KEY `user_student` (`user_id`);
+  ADD KEY `user_student` (`user_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `user_name` (`user_name`),
   ADD KEY `user_id` (`user_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `project`
+--
+ALTER TABLE `project`
+  MODIFY `project_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `user`
+--
+ALTER TABLE `user`
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
 --
 
 --
+-- Constraints for table `donations`
+--
+ALTER TABLE `donations`
+  ADD CONSTRAINT `donations_ibfk_1` FOREIGN KEY (`sponsor_id`) REFERENCES `sponsor` (`user_id`),
+  ADD CONSTRAINT `donations_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `student` (`user_id`);
+
+--
 -- Constraints for table `invest`
 --
 ALTER TABLE `invest`
-  ADD CONSTRAINT `project_invest` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`),
+  ADD CONSTRAINT `project_invest` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE SET NULL ON UPDATE SET NULL,
   ADD CONSTRAINT `sponsor_invest` FOREIGN KEY (`user_id`) REFERENCES `sponsor` (`user_id`) ON DELETE SET NULL ON UPDATE SET NULL;
 
 --
--- Constraints for table `project`
+-- Constraints for table `project_members`
 --
-ALTER TABLE `project`
-  ADD CONSTRAINT `user_project` FOREIGN KEY (`user_id`) REFERENCES `student` (`user_id`) ON DELETE SET NULL ON UPDATE SET NULL;
+ALTER TABLE `project_members`
+  ADD CONSTRAINT `project_members_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `student` (`user_id`),
+  ADD CONSTRAINT `project_members_ibfk_2` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
 
 --
 -- Constraints for table `sponsor`
