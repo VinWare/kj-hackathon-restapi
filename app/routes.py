@@ -72,7 +72,7 @@ def sign_up():
     if not 'username' in request.json or not 'password' in request.json or not 'full-name' in request.json or not 'blockchain-address' in request.json:
         abort(400)
     cur = mysql.connection.cursor()
-    cur.execute('INSERT INTO user(username, password_hash, full_name, blockchain) VALUES(%s, %s, %s, %s)', (request.json['username'], pass_hash(request.json['password']), request.json['full-name'], request.json['blockchain-address']))
+    cur.execute('INSERT INTO user(user_name, password_hash, full_name, blockchain) VALUES(%s, %s, %s, %s)', (request.json['username'], pass_hash(request.json['password']), request.json['full-name'], request.json['blockchain-address']))
     mysql.connection.commit()
 
 @app.route('/crowdfunding/ap/v1.0.0/project', methods=['POST'])
