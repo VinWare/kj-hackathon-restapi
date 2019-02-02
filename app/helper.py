@@ -13,7 +13,7 @@ def generate_token():
     return serializer.dumps({'id': g.user_id})
 
 def verify_token(token):
-    serializer = Serializer(app.config['SECRET_KEY'], expires_in=app.config['EXPIRATION'])
+    serializer = Serializer(app.config['SECRET_KEY'])
     try:
         data = serializer.loads(token)
     except SignatureExpired:
