@@ -117,7 +117,6 @@ def get_student_project():
 
 # POST requests
 @app.route('/crowdfunding/api/v1.0.0/sign-up', methods=['POST'])
-@auth.login_required
 def sign_up():
     if not request.json:
         abort(400)
