@@ -30,6 +30,8 @@ def student(student_id):
     cur = mysql.connection.cursor()
     cur.execute("SELECT user_id, user_name, full_name, college_name, year, branch FROM user NATURAL JOIN student WHERE user_id=%s", (student_id,))
     student = cur.fetchone()
+    if not student:
+        abort(404)
     return(jsonify({'student': make_public(student)}))
 
 @app.route('/crowdfunding/api/v1.0.0/projects', methods=['GET'])
@@ -46,6 +48,8 @@ def project(project_id):
     cur = mysql.connection.cursor()
     cur.execute("SELECT full_name, project_id, project_name, category, phase, cost, start_date, complete_date, project_type FROM user NATURAL JOIN student NATURAL JOIN project WHERE project_id=%s", (project_id,))
     project = cur.fetchone()
+    if not project:
+        abort(404)
     return(jsonify({'project': make_public(project)}))
 
 @app.route('/crowdfunding/api/v1.0.0/sponsors', methods=['GET'])
@@ -62,6 +66,8 @@ def sponsor(sponsor_id):
     cur = mysql.connection.cursor()
     cur.execute("SELECT user_id, user_name, full_name, company FROM user NATURAL JOIN sponsor WHERE user_id=%s", (sponsor_id,))
     sponsor = cur.fetchone()
+    if not sponsor:
+        abort(404)
     return(jsonify({'sponsor': make_public(sponsor)}))
 
 # POST requests
