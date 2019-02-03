@@ -4,8 +4,8 @@ from .auth_setup import auth
 from .db_setup import mysql
 from .helper import get_public_types, generate_token, make_public, pass_hash
 
-@app.route('/')
-@app.route('/index')
+@app.route('/crowdfunding/api/v1.0.0/')
+@app.route('/crowdfunding/api/v1.0.0/index')
 def index():
     return(jsonify({'content': 'Welcome to the home page of the crowdfunding rest api'}))
 
@@ -35,7 +35,6 @@ def student(student_id):
     return(jsonify({'student': make_public(student)}))
 
 @app.route('/crowdfunding/api/v1.0.0/projects', methods=['GET'])
-@auth.login_required
 def projects():
     cur = mysql.connection.cursor()
     cur.execute("SELECT full_name, project_id, project_name, category, phase, cost, start_date, complete_date, project_type FROM user NATURAL JOIN student NATURAL JOIN project")
@@ -43,7 +42,6 @@ def projects():
     return(jsonify({'projects': [make_public(project) for project in all_projects]}))
 
 @app.route('/crowdfunding/api/v1.0.0/projects/<int:project_id>', methods=['GET'])
-@auth.login_required
 def project(project_id):
     cur = mysql.connection.cursor()
     cur.execute("SELECT full_name, project_id, project_name, category, phase, cost, start_date, complete_date, project_type FROM user NATURAL JOIN student NATURAL JOIN project WHERE project_id=%s", (project_id,))
@@ -92,6 +90,31 @@ def internship(internship_id):
         abort(404)
     return(jsonify({'internship': make_public(internship)}))
 
+@app.route('/crowdfunding/api/v1.0.0/sponsor/invest', methods=['POST'])
+@auth.login_required
+def get_sponsor_invest():
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT user_id, company FROM sponsor WHERE user_id=%s', (app.config['CURR_USER_ID'],))
+    sponsor = cur.fetchone()
+    if not sponsor:
+        abort(404)
+    cur.execute('SELECT project_id, project_name, amount, description FROM invest NATURAL JOIN project WHERE user_id=%s', (app.config['CURR_USER_ID'],))
+    invests = cur.fetchall()
+    return jsonify({'investments': invests})
+
+@app.route('/crowdfunding/api/v1.0.0/student/project', methods=['POST'])
+@auth.login_required
+def get_student_project():
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT user_id, college_name FROM student WHERE user_id=%s', (app.config['CURR_USER_ID'],))
+    student = cur.fetchone()
+    if not student:
+        abort(404)
+    invests = cur.fetchall()
+    cur.execute("SELECT full_name, project_id, project_name, category, phase, cost, start_date, complete_date, project_type FROM user NATURAL JOIN student NATURAL JOIN project WHERE user_id=%s", (app.config['CURR_USER_ID'],))
+    all_projects = cur.fetchall()
+    return jsonify({'investments': all_projects})
+
 # POST requests
 @app.route('/crowdfunding/api/v1.0.0/sign-up', methods=['POST'])
 @auth.login_required
@@ -105,7 +128,7 @@ def sign_up():
     mysql.connection.commit()
     return(jsonify({'status': 'Created'}), 201)
 
-@app.route('/crowdfunding/ap/v1.0.0/project', methods=['POST'])
+@app.route('/crowdfunding/api/v1.0.0/project', methods=['POST'])
 @auth.login_required
 def create_project():
     if not request.json:
@@ -118,7 +141,7 @@ def create_project():
     mysql.connection.commit()
     return(jsonify({'status': 'Created'}), 201)
 
-@app.route('/crowdfunding/ap/v1.0.0/student', methods=['POST'])
+@app.route('/crowdfunding/api/v1.0.0/student', methods=['POST'])
 @auth.login_required
 def create_student():
     if not request.json:
@@ -131,7 +154,7 @@ def create_student():
     mysql.connection.commit()
     return(jsonify({'status': 'Created'}), 201)
 
-@app.route('/crowdfunding/ap/v1.0.0/sponsor', methods=['POST'])
+@app.route('/crowdfunding/api/v1.0.0/sponsor', methods=['POST'])
 @auth.login_required
 def create_sponsor():
     if not request.json:
@@ -144,7 +167,7 @@ def create_sponsor():
     mysql.connection.commit()
     return(jsonify({'status': 'Created'}), 201)
 
-@app.route('/crowdfunding/app/v1.0.0/internship', methods=['POST'])
+@app.route('/crowdfunding/api/v1.0.0/internship', methods=['POST'])
 @auth.login_required
 def create_internship():
     if not request.json:
@@ -157,9 +180,9 @@ def create_internship():
     mysql.connection.commit()
     return(jsonify({'status': 'Created'}), 201)
 
-@app.route('/crowdfunding/app/v1.0.0/fund-project', methods=['POST'])
+@app.route('/crowdfunding/api/v1.0.0/invest', methods=['POST'])
 @auth.login_required
-def fund_project():
+def create_invest():
     if not request.json:
         abort(400)
     if not 'project_id' in request.json or not 'amount' in request.json:
