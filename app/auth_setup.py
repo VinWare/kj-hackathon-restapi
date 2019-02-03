@@ -14,7 +14,7 @@ def verify_password(username_token, password):
                 cur = mysql.connection.cursor()
                 cur.execute("SELECT user_id, password_hash FROM user WHERE user_name = %s", (username_token,))
                 user = cur.fetchone()
-                if not user or check_password_hash(user['password_hash'],password):
+                if not user or not check_password_hash(user['password_hash'],password):
                         return False
                 user_id = user['user_id']
         app.config['CURR_USER_ID'] = user_id
@@ -22,4 +22,4 @@ def verify_password(username_token, password):
 
 @auth.error_handler
 def unauthorized():
-    return make_response(jsonify({'error': 'Unauthorized access'}), 403)
+    return make_response(jsonify({'error': 'Unauthorized access'}), 401)

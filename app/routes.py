@@ -74,6 +74,7 @@ def sign_up():
     cur = mysql.connection.cursor()
     cur.execute('INSERT INTO user(user_name, password_hash, full_name, blockchain) VALUES(%s, %s, %s, %s)', (request.json['username'], pass_hash(request.json['password']), request.json['full-name'], request.json['blockchain-address']))
     mysql.connection.commit()
+    return(jsonify({'status': 'Created'}), 201)
 
 @app.route('/crowdfunding/ap/v1.0.0/project', methods=['POST'])
 def create_project():
