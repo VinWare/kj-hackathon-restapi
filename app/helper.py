@@ -6,7 +6,7 @@ from flask import g, url_for
 from werkzeug.security import generate_password_hash
 
 def get_public_types():
-    return ['Product']
+    return ['Product', 'Event']
 
 def generate_token():
     serializer = Serializer(app.config['SECRET_KEY'], expires_in=app.config['EXPIRATION'])
