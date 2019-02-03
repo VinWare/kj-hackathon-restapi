@@ -1,0 +1,13 @@
+{
+  "db": {
+    "host": "127.0.0.1",
+    "user": "root",
+    "password": "c1o0l0d8",
+    "dbname": "kj_crowdfunding",
+    "cursorclass": "DictCursor"
+  },
+  "security": {
+    "secretkey": "This is some secret key",
+    "expiration": 86400 
+  }
+}
