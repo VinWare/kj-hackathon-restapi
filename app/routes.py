@@ -94,6 +94,7 @@ def internship(internship_id):
 
 # POST requests
 @app.route('/crowdfunding/api/v1.0.0/sign-up', methods=['POST'])
+@auth.login_required
 def sign_up():
     if not request.json:
         abort(400)
@@ -105,6 +106,7 @@ def sign_up():
     return(jsonify({'status': 'Created'}), 201)
 
 @app.route('/crowdfunding/ap/v1.0.0/project', methods=['POST'])
+@auth.login_required
 def create_project():
     if not request.json:
         abort(400)
@@ -113,10 +115,11 @@ def create_project():
     rj = request.json
     cur = mysql.connection.cursor()
     cur.execute('INSERT INTO project(user_id, project_name, category, phase, cost, start_date, project_type) VALUES(%s, %s, %s, %s, %s, %s, %s)', (rj['user_id'], rj['project_name'], rj['category'], rj['phase'], rj['cost'], rj['start_date'], rj['project_type']))
-    mysql.connect.commit()
+    mysql.connection.commit()
     return(jsonify({'status': 'Created'}), 201)
 
 @app.route('/crowdfunding/ap/v1.0.0/student', methods=['POST'])
+@auth.login_required
 def create_student():
     if not request.json:
         abort(400)
@@ -125,10 +128,11 @@ def create_student():
     rj = request.json
     cur = mysql.connection.cursor()
     cur.execute('INSERT INTO student(user_id, college, year, branch) VALUES(%s, %s, %s, %s)', (rj['user_id'], rj['college'], rj['year'], rj['branch']))
-    mysql.connect.commit()
+    mysql.connection.commit()
     return(jsonify({'status': 'Created'}), 201)
 
 @app.route('/crowdfunding/ap/v1.0.0/sponsor', methods=['POST'])
+@auth.login_required
 def create_sponsor():
     if not request.json:
         abort(400)
@@ -137,10 +141,11 @@ def create_sponsor():
     rj = request.json
     cur = mysql.connection.cursor()
     cur.execute('INSERT INTO sponsor(user_id,company) VALUES(%s, %s)', (rj['user_id'], rj['company']))
-    mysql.connect.commit()
+    mysql.connection.commit()
     return(jsonify({'status': 'Created'}), 201)
 
-@app.route('/crowdfunding/ap/v1.0.0/internship', methods=['POST'])
+@app.route('/crowdfunding/app/v1.0.0/internship', methods=['POST'])
+@auth.login_required
 def create_internship():
     if not request.json:
         abort(400)
@@ -149,7 +154,19 @@ def create_internship():
     rj = request.json
     cur = mysql.connection.cursor()
     cur.execute('INSERT INTO internship(user_id,company) VALUES(%s, %s)', (rj['user_id'], rj['company']))
-    mysql.connect.commit()
+    mysql.connection.commit()
+    return(jsonify({'status': 'Created'}), 201)
+
+@app.route('/crowdfunding/app/v1.0.0/fund-project', methods=['POST'])
+@auth.login_required
+def fund_project():
+    if not request.json:
+        abort(400)
+    if not 'project_id' in request.json or not 'amount' in request.json:
+        abort(400)
+    cur = mysql.connection.cursor()
+    cur.execute('INSERT INTO invest(user_id, project_id, amount, description) VALUES(%s, %s, %s, %s)', (app.config['CURR_USER_ID'], request.json['project_id'], request.json['amount'], request.json.get("description")))
+    mysql.connection.commit()
     return(jsonify({'status': 'Created'}), 201)
 
 # Error handlers
