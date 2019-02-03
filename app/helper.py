@@ -10,7 +10,7 @@ def get_public_types():
 
 def generate_token():
     serializer = Serializer(app.config['SECRET_KEY'], expires_in=app.config['EXPIRATION'])
-    return serializer.dumps({'id': app.config['user_id']})
+    return serializer.dumps({'id': app.config['CURR_USER_ID']})
 
 def verify_token(token):
     serializer = Serializer(app.config['SECRET_KEY'])

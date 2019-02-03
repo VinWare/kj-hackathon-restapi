@@ -11,3 +11,4 @@ class Config:
     MYSQL_CURSORCLASS = config['db']['cursorclass']
     SECRET_KEY = config['security']['secretkey']
     EXPIRATION = config['security']['expiration']
+    CURR_USER_ID = None

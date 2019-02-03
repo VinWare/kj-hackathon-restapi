@@ -17,7 +17,7 @@ def verify_password(username_token, password):
                 if not user or check_password_hash(user['password_hash'],password):
                         return False
                 user_id = user['user_id']
-        app.config['user_id'] = user_id
+        app.config['CURR_USER_ID'] = user_id
         return True
 
 @auth.error_handler
