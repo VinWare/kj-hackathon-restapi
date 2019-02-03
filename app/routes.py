@@ -11,13 +11,11 @@ def index():
 
 # GET routes
 @app.route('/crowdfunding/api/v1.0.0/login', methods=['GET'])
-@auth.login_required
 def login():
     token = generate_token()
     return jsonify({'token': token.decode('ascii')})
 
 @app.route('/crowdfunding/api/v1.0.0/students', methods=['GET'])
-@auth.login_required
 def students():
     cur = mysql.connection.cursor()
     cur.execute("SELECT user_id, user_name, full_name, college_name, year, branch FROM user NATURAL JOIN student")
@@ -25,7 +23,6 @@ def students():
     return(jsonify({'students': [make_public(student) for student in all_students]}))
 
 @app.route('/crowdfunding/api/v1.0.0/students/<int:student_id>', methods=['GET'])
-@auth.login_required
 def student(student_id):
     cur = mysql.connection.cursor()
     cur.execute("SELECT user_id, user_name, full_name, college_name, year, branch FROM user NATURAL JOIN student WHERE user_id=%s", (student_id,))
@@ -51,7 +48,6 @@ def project(project_id):
     return(jsonify({'project': make_public(project)}))
 
 @app.route('/crowdfunding/api/v1.0.0/sponsors', methods=['GET'])
-@auth.login_required
 def sponsors():
     cur = mysql.connection.cursor()
     cur.execute("SELECT user_id, user_name, full_name, company FROM user NATURAL JOIN sponsor")
@@ -59,7 +55,6 @@ def sponsors():
     return(jsonify({'sponsors': [make_public(sponsor) for sponsor in all_sponsors]}))
 
 @app.route('/crowdfunding/api/v1.0.0/sponsors/<int:sponsor_id>', methods=['GET'])
-@auth.login_required
 def sponsor(sponsor_id):
     cur = mysql.connection.cursor()
     cur.execute("SELECT user_id, user_name, full_name, company FROM user NATURAL JOIN sponsor WHERE user_id=%s", (sponsor_id,))
@@ -69,7 +64,6 @@ def sponsor(sponsor_id):
     return(jsonify({'sponsor': make_public(sponsor)}))
 
 @app.route('/crowdfunding/api/v1.0.0/internships', methods=['GET'])
-@auth.login_required
 def internships():
     cur = mysql.connection.cursor()
     sponsor = request.args.get("sponsor")
@@ -81,7 +75,6 @@ def internships():
     return(jsonify({'internships': [make_public(internship) for internship in all_internships]}))
 
 @app.route('/crowdfunding/api/v1.0.0/internships/<int:internship_id>', methods=['GET'])
-@auth.login_required
 def internship(internship_id):
     cur = mysql.connection.cursor()
     cur.execute("SELECT sponsor_id, company, full_name, internship_id, internship_name, internship_description FROM user NATURAL JOIN sponsor JOIN internship ON(user_id = sponsor_id) WHERE internship_id=%s", (internship_id,))
@@ -91,7 +84,6 @@ def internship(internship_id):
     return(jsonify({'internship': make_public(internship)}))
 
 @app.route('/crowdfunding/api/v1.0.0/sponsor/invest', methods=['POST'])
-@auth.login_required
 def get_sponsor_invest():
     cur = mysql.connection.cursor()
     cur.execute('SELECT user_id, company FROM sponsor WHERE user_id=%s', (app.config['CURR_USER_ID'],))
@@ -103,7 +95,6 @@ def get_sponsor_invest():
     return jsonify({'investments': invests})
 
 @app.route('/crowdfunding/api/v1.0.0/student/project', methods=['POST'])
-@auth.login_required
 def get_student_project():
     cur = mysql.connection.cursor()
     cur.execute('SELECT user_id, college_name FROM student WHERE user_id=%s', (app.config['CURR_USER_ID'],))
@@ -128,7 +119,6 @@ def sign_up():
     return(jsonify({'status': 'Created'}), 201)
 
 @app.route('/crowdfunding/api/v1.0.0/project', methods=['POST'])
-@auth.login_required
 def create_project():
     if not request.json:
         abort(400)
@@ -141,7 +131,6 @@ def create_project():
     return(jsonify({'status': 'Created'}), 201)
 
 @app.route('/crowdfunding/api/v1.0.0/student', methods=['POST'])
-@auth.login_required
 def create_student():
     if not request.json:
         abort(400)
@@ -154,7 +143,6 @@ def create_student():
     return(jsonify({'status': 'Created'}), 201)
 
 @app.route('/crowdfunding/api/v1.0.0/sponsor', methods=['POST'])
-@auth.login_required
 def create_sponsor():
     if not request.json:
         abort(400)
@@ -167,7 +155,6 @@ def create_sponsor():
     return(jsonify({'status': 'Created'}), 201)
 
 @app.route('/crowdfunding/api/v1.0.0/internship', methods=['POST'])
-@auth.login_required
 def create_internship():
     if not request.json:
         abort(400)
@@ -180,7 +167,6 @@ def create_internship():
     return(jsonify({'status': 'Created'}), 201)
 
 @app.route('/crowdfunding/api/v1.0.0/invest', methods=['POST'])
-@auth.login_required
 def create_invest():
     if not request.json:
         abort(400)
